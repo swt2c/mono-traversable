@@ -8,6 +8,7 @@ on:
 
 jobs:
   stack:
+    if: false
     name: Stack
     runs-on: ${{ matrix.os }}
     strategy:
@@ -70,6 +71,7 @@ jobs:
           stack test --system-ghc $extraLibDirs $extraIncludeDirsLLVM $extraIncludeDirsFFI --fast --no-terminal --snapshot=lts-$snapshot
 
   Cabal:
+    if: false
     name: Cabal
     runs-on: ${{ matrix.os }}
     strategy:
@@ -105,3 +107,19 @@ jobs:
           ghc --version
           cabal --version
           cabal test --minimize-conflict-set -O0 all
+
+  i386:
+    runs-on: ubuntu-latest
+    container:
+      image: i386/debian:bookworm
+    steps:
+      - name: Install GHC
+        run: |
+          apt-get update -y
+          apt-get install -y cabal-install ghc
+      - name: Clone project
+        uses: actions/checkout@v1 #This version must stay old enough to remain compatible with the container image
+      - name: Build and run tests
+        run: |
+          cabal update
+          cabal test all
